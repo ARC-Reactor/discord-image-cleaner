@@ -1,0 +1,16 @@
+# Copy this file to `.env` and fill in your values
+
+DISCORD_TOKEN=
+GUILD_ID=
+TARGET_CHANNELS=
+
+# Optional overrides
+# DAYS_OLD=7
+# CHECK_INTERVAL_HOURS=12
+# ARCHIVE_FOLDER=/path/to/archive
+# DATABASE_FILE=/path/to/image_tracker.db
+# TEST_MODE=true   (set to false to enable real deletions; or set DISABLE_TEST_MODE=true)
+# MAX_ARCHIVE_SIZE_MB=0
+# LOG_FILE=
+# LOG_MAX_BYTES=5242880
+# LOG_BACKUP_COUNT=5

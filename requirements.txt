@@ -1,0 +1,6 @@
+discord.py==2.3.2
+python-dotenv==1.0.1
+aiosqlite==0.19.0
+# Optional: silences "PyNaCl is not installed, voice will NOT be supported" (not needed for this bot)
+PyNaCl>=1.5.0
+

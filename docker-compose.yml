@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  bot:
+    build: .
+    container_name: discord-image-cleaner
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Use a data directory so the bind mount is a directory (avoids Docker creating a dir when mounting a missing file)
+      - DATABASE_FILE=${DATABASE_FILE:-/app/data/image_tracker.db}
+    volumes:
+      - ./archive:/app/archive
+      - ./data:/app/data
+    # if you want to override the command, uncomment below
+    # command: ["python3", "bot.py"]
