@@ -12,6 +12,19 @@ SUPPORTED_TYPES = {
         "extensions": (".png", ".jpg", ".jpeg", ".webp"),
         "description": "Common image formats",
     },
+        "videos": {
+        "extensions": (".mp4", ".mov", ".avi", ".mkv", ".webm"),
+        "description": "Common video formats",
+    },
+    "audio": {
+        "extensions": (".mp3", ".wav", ".ogg", ".m4a", ".aac"),
+        "description": "Common audio formats",
+    },
+    "documents": {
+        "extensions": (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"),
+        "description": "Common document formats",
+    },
+
 }
 
 # Flatten for quick lookup
