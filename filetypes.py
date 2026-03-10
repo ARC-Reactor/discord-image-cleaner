@@ -12,7 +12,7 @@ SUPPORTED_TYPES = {
         "extensions": (".png", ".jpg", ".jpeg", ".webp"),
         "description": "Common image formats",
     },
-        "videos": {
+    "videos": {
         "extensions": (".mp4", ".mov", ".avi", ".mkv", ".webm"),
         "description": "Common video formats",
     },
