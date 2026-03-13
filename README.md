@@ -280,7 +280,7 @@ After that, build and run as below.
 
 3. **Or use Docker Compose**
    ```bash
-   docker compose up -d
+   docker-compose up -d
    ```
    The compose file uses `./archive` and `./data`; ensure you’ve created and chown’d them as in [Host setup before first run](#host-setup-before-first-run-docker) above.
 
