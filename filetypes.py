@@ -9,7 +9,7 @@ from typing import Tuple
 # All supported file types, organized by category
 SUPPORTED_TYPES = {
     "images": {
-        "extensions": (".png", ".jpg", ".jpeg", ".webp"),
+        "extensions": (".png", ".jpg", ".jpeg", ".webp", ".gif"),
         "description": "Common image formats",
     },
     "videos": {

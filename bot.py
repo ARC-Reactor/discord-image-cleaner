@@ -37,7 +37,8 @@ async def on_ready():
             except Exception:
                 _logger.exception("Initial processing failed for channel %s", channel_id)
 
-    cleanup_loop.start()
+    if not cleanup_loop.is_running():
+        cleanup_loop.start()
 
 
 @tasks.loop(hours=CHECK_INTERVAL_HOURS)
@@ -66,4 +67,5 @@ async def on_disconnect():
         _logger.exception("Error while closing database")
 
 
-bot.run(TOKEN)
+if __name__ == "__main__":
+    bot.run(TOKEN)
