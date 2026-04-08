@@ -1,6 +1,6 @@
 # discord-image-cleaner
 
-Downloads images older than a configurable number of days, archives them locally, and removes the messages from Discord.
+Downloads attachments (images, videos, audio, documents) older than a configurable number of days, archives them locally, and removes the messages from Discord.
 
 ---
 
@@ -19,7 +19,6 @@ values are marked with **(required)**; defaults are shown where applicable.
 | `ARCHIVE_FOLDER`      | Where to store archived images                                              | `archive` next to repo        |
 | `DATABASE_FILE`       | SQLite file path                                                            | `image_tracker.db` next to repo |
 | `TEST_MODE`           | If truthy, do *not* delete messages (`true/1/yes/on`); falsy enables real deletions (`false/0/no/off`). Quotes are stripped (`"false"` works). | `true`                        |
-| `DISABLE_TEST_MODE`   | If set to a truthy value (`true/1/yes`), same as `TEST_MODE=false` (enables real deletions). Use this if `TEST_MODE=false` is not applied. | —                             |
 | `MANAGED_FILE_TYPES`  | Comma-separated file type categories to archive (e.g., `images`)            | all available types           |
 | `MAX_ARCHIVE_SIZE_MB` | Maximum archive size in megabytes (0 = no limit)                           | `0`                           |
 | `LOG_FILE`            | Path to logfile                                                             | —                             |
@@ -47,7 +46,7 @@ specified by `CHECK_INTERVAL_HOURS`.
 
 - Connects to a single guild and scans the configured channels for messages
   older than `DAYS_OLD`.
-- Downloads recognized image attachments (`png`, `jpg`, `jpeg`, `webp`) to
+- Downloads recognized image attachments (`png`, `jpg`, `jpeg`, `webp`, `gif`) to
   an archive folder structured by channel ID and date.
 - Records each saved image in a local SQLite database so deletions can be
   tracked and messages are not processed twice.
@@ -64,12 +63,15 @@ By default, the bot archives all supported image types. You can narrow this by
 setting `MANAGED_FILE_TYPES` to a comma-separated list of file type categories.
 
 **Available categories:**
-- `images` – PNG, JPG, JPEG, WebP (default)
+- `images` – PNG, JPG, JPEG, WebP, GIF
+- `videos` – MP4, MOV, AVI, MKV, WebM
+- `audio` – MP3, WAV, OGG, M4A, AAC
+- `documents` – PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX
 
 Example:
 ```ini
-# Only process image types
-MANAGED_FILE_TYPES=images
+# Only process images and videos
+MANAGED_FILE_TYPES=images,videos
 ```
 
 If `MANAGED_FILE_TYPES` is not set, all available types are archived.
@@ -85,12 +87,13 @@ If `MANAGED_FILE_TYPES` is not set, all available types are archived.
 
 ### Disabling test mode (enabling real deletions)
 
-To turn off test mode so the bot actually deletes messages, use **one** of these in `.env`:
+To turn off test mode so the bot actually deletes messages, set this in `.env`:
 
-- **Option A:** `TEST_MODE=false` (or `TEST_MODE=0`, `TEST_MODE=no`, `TEST_MODE=off`)
-- **Option B:** `DISABLE_TEST_MODE=true` (or `DISABLE_TEST_MODE=1`, `DISABLE_TEST_MODE=yes`)
+```ini
+TEST_MODE=false
+```
 
-Use the exact key `TEST_MODE` or `DISABLE_TEST_MODE` (case-sensitive in the env). Values can be quoted or unquoted (`TEST_MODE=false` or `TEST_MODE="false"` both work). Restart the bot or container after changing; the startup log will show `(TEST_MODE=False)` when deletions are enabled.
+Also accepted: `TEST_MODE=0`, `TEST_MODE=no`, `TEST_MODE=off`. Values can be quoted or unquoted (`TEST_MODE=false` or `TEST_MODE="false"` both work). Restart the bot or container after changing; the startup log will show `(TEST_MODE=False)` when deletions are enabled.
 - Archive and database paths can be overridden via environment variables; the
   defaults are relative to the repository root.
 
