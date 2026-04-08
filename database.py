@@ -71,7 +71,7 @@ async def insert_record(message_id, channel_id, created_at, file_path):
         )
         await _db.commit()
     except Exception as e:
-        _logger.exception("Failed to insert record for message %s: %s", message_id, e)
+        _logger.exception("Failed to insert record for message %s", message_id)
 
 
 async def get_channel_state(channel_id):
@@ -89,7 +89,7 @@ async def get_channel_state(channel_id):
             return row[0], row[1]
         return None, None
     except Exception as e:
-        _logger.exception("Failed to get channel state for %s: %s", channel_id, e)
+        _logger.exception("Failed to get channel state for %s", channel_id)
         return None, None
 
 
@@ -105,7 +105,7 @@ async def upsert_channel_state(channel_id, last_message_id, last_processed_at):
         )
         await _db.commit()
     except Exception as e:
-        _logger.exception("Failed to upsert channel state for %s: %s", channel_id, e)
+        _logger.exception("Failed to upsert channel state for %s", channel_id)
 
 async def mark_deleted(message_id):
     global _db
@@ -118,4 +118,4 @@ async def mark_deleted(message_id):
         )
         await _db.commit()
     except Exception as e:
-        _logger.exception("Failed to mark message %s deleted: %s", message_id, e)
+        _logger.exception("Failed to mark message %s deleted", message_id)

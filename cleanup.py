@@ -15,13 +15,6 @@ _SAFE_FILENAME_RE = re.compile(r"[^A-Za-z0-9._-]")
 BATCH_SIZE = 200
 
 
-def sanitize_filename(filename: str) -> str:
-    """Return a filesystem-safe filename (no path components)."""
-    base_name = os.path.basename(filename or "attachment")
-    safe = _SAFE_FILENAME_RE.sub("_", base_name)
-    return safe
-
-
 def prune_archive(base_path: Path, max_bytes: int) -> int:
     """Prune files under base_path until total size <= max_bytes.
 
@@ -36,11 +29,12 @@ def prune_archive(base_path: Path, max_bytes: int) -> int:
         for fn in filenames:
             fp = Path(root) / fn
             try:
-                sz = fp.stat().st_size
+                stat = fp.stat()
             except FileNotFoundError:
                 continue
+            sz = stat.st_size
             total += sz
-            files.append((fp, fp.stat().st_mtime, sz))
+            files.append((fp, stat.st_mtime, sz))
 
     if total <= max_bytes:
         return 0
@@ -98,6 +92,11 @@ async def process_channel(channel):
                 if not message.attachments:
                     continue
 
+                # permission check once per message
+                can_delete = TEST_MODE or channel.permissions_for(channel.guild.me).manage_messages
+                if not TEST_MODE and not can_delete:
+                    _logger.warning("Missing manage_messages permission in channel %s; skipping delete for %s", channel.id, message.id)
+
                 for attachment in message.attachments:
                     filename = attachment.filename or "attachment"
                     if not filename.lower().endswith(FILE_TYPES):
@@ -131,22 +130,16 @@ async def process_channel(channel):
                         str(file_path),
                     )
 
-                    if TEST_MODE:
-                        _logger.info("[TEST MODE] Would delete message %s", message.id)
-                    else:
-                        # permission check
-                        perms = channel.permissions_for(channel.guild.me)
-                        if not perms.manage_messages:
-                            _logger.warning("Missing manage_messages permission in channel %s; skipping delete for %s", channel.id, message.id)
-                            continue
-
-                        try:
-                            await message.delete()
-                            await mark_deleted(message.id)
-                            _logger.info("Deleted message %s", message.id)
-                            await asyncio.sleep(0.2)
-                        except Exception:
-                            _logger.exception("Failed to delete message %s", message.id)
+                if TEST_MODE:
+                    _logger.info("[TEST MODE] Would delete message %s", message.id)
+                elif can_delete:
+                    try:
+                        await message.delete()
+                        await mark_deleted(message.id)
+                        _logger.info("Deleted message %s", message.id)
+                        await asyncio.sleep(0.2)
+                    except Exception:
+                        _logger.exception("Failed to delete message %s", message.id)
 
                 processed_max = max(processed_max, message.id)
                 batch_count += 1

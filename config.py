@@ -57,13 +57,19 @@ except ValueError:
 	raise RuntimeError("TARGET_CHANNELS must be a comma-separated list of integers")
 
 # Operational settings (allow overrides via env)
-DAYS_OLD = int(os.getenv("DAYS_OLD", "7"))
+try:
+	DAYS_OLD = int(os.getenv("DAYS_OLD", "7"))
+except ValueError:
+	raise RuntimeError("DAYS_OLD must be a positive integer")
 if DAYS_OLD <= 0:
-	raise ValueError("DAYS_OLD must be a positive integer")
+	raise RuntimeError("DAYS_OLD must be a positive integer")
 
-CHECK_INTERVAL_HOURS = int(os.getenv("CHECK_INTERVAL_HOURS", "12"))
+try:
+	CHECK_INTERVAL_HOURS = int(os.getenv("CHECK_INTERVAL_HOURS", "12"))
+except ValueError:
+	raise RuntimeError("CHECK_INTERVAL_HOURS must be a positive integer")
 if CHECK_INTERVAL_HOURS <= 0:
-	raise ValueError("CHECK_INTERVAL_HOURS must be a positive integer")
+	raise RuntimeError("CHECK_INTERVAL_HOURS must be a positive integer")
 
 ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
 if ARCHIVE_FOLDER:
@@ -74,14 +80,16 @@ else:
 DATABASE_FILE = os.getenv("DATABASE_FILE") or str((_BASE_DIR / "image_tracker.db").resolve())
 
 # Test mode: if True, bot does not delete messages (safe default).
-# Set TEST_MODE=false (or DISABLE_TEST_MODE=true) to enable real deletions.
-if _get_bool_env("DISABLE_TEST_MODE", default=False):
-	TEST_MODE = False
-else:
-	TEST_MODE = _get_bool_env("TEST_MODE", default=True)
+# Set TEST_MODE=false to enable real deletions.
+TEST_MODE = _get_bool_env("TEST_MODE", default=True)
 
 # Maximum archive size in megabytes. 0 means no limit.
-MAX_ARCHIVE_SIZE_MB = int(os.getenv("MAX_ARCHIVE_SIZE_MB", "0"))
+try:
+	MAX_ARCHIVE_SIZE_MB = int(os.getenv("MAX_ARCHIVE_SIZE_MB", "0"))
+except ValueError:
+	raise RuntimeError("MAX_ARCHIVE_SIZE_MB must be a non-negative integer")
+if MAX_ARCHIVE_SIZE_MB < 0:
+	raise RuntimeError("MAX_ARCHIVE_SIZE_MB must be a non-negative integer")
 
 LOG_FILE = os.getenv("LOG_FILE")
 LOG_MAX_BYTES = int(os.getenv("LOG_MAX_BYTES", "5242880"))
