@@ -15,6 +15,13 @@ _SAFE_FILENAME_RE = re.compile(r"[^A-Za-z0-9._-]")
 BATCH_SIZE = 200
 
 
+def sanitize_filename(filename: str) -> str:
+    """Return a filesystem-safe filename (no path components)."""
+    base_name = os.path.basename(filename or "attachment")
+    safe = _SAFE_FILENAME_RE.sub("_", base_name)
+    return safe
+
+
 def prune_archive(base_path: Path, max_bytes: int) -> int:
     """Prune files under base_path until total size <= max_bytes.
 
@@ -97,14 +104,15 @@ async def process_channel(channel):
                 if not TEST_MODE and not can_delete:
                     _logger.warning("Missing manage_messages permission in channel %s; skipping delete for %s", channel.id, message.id)
 
+                matched = False
                 for attachment in message.attachments:
                     filename = attachment.filename or "attachment"
                     if not filename.lower().endswith(FILE_TYPES):
                         continue
 
+                    matched = True
                     # sanitize and uniquify filename
-                    base_name = os.path.basename(filename)
-                    safe = _SAFE_FILENAME_RE.sub("_", base_name)
+                    safe = sanitize_filename(filename)
                     unique_prefix = f"{message.id}_"
                     if getattr(attachment, "id", None) is None:
                         unique_prefix += uuid4().hex + "_"
@@ -130,9 +138,9 @@ async def process_channel(channel):
                         str(file_path),
                     )
 
-                if TEST_MODE:
+                if matched and TEST_MODE:
                     _logger.info("[TEST MODE] Would delete message %s", message.id)
-                elif can_delete:
+                elif matched and can_delete:
                     try:
                         await message.delete()
                         await mark_deleted(message.id)
